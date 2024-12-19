@@ -65,6 +65,7 @@ public:
                 double value = std::stod(expression.substr(i, j - i));
                 values.push(value);
                 i = j - 1;
+
             } else if (c == '.') {
                 if (expression[i - 1] == '.' || expression[i + 1] == '.') {
                     throw std::runtime_error("Invalid expression");
