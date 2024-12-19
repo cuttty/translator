@@ -21,6 +21,7 @@ public:
 
         for (size_t i = 0; i < expression.size(); ++i) {
             char c = expression[i];
+
             if (c == '-') {
                 // Check if the minus sign is at the beginning of a number
                 if (i == 0 || expression[i - 1] == '(') {
@@ -42,18 +43,6 @@ public:
                 // Parse number
                 size_t j = i;
                 while (j < expression.size() && (isdigit(expression[j]) || expression[j] == '.')) {
-                    if (expression[j] == '.') {
-                        if (expression[j - 1] == '.' || expression[j + 1] == '.') {
-                            throw std::runtime_error("Invalid expression");
-                        }
-                        size_t l = j;
-                        while (isdigit(expression[l])) {
-                            if (expression[l + 1] == '.') {
-                                throw std::runtime_error("Invalid expression");
-                            }
-                            ++l;
-                        }
-                    }
                     ++j;
                 }
                 if (j > i + 1 && expression[j] == '.') {
@@ -66,9 +55,6 @@ public:
                 values.push(value);
                 i = j - 1;
             } else if (c == '.') {
-                if (expression[i - 1] == '.' || expression[i + 1] == '.') {
-                    throw std::runtime_error("Invalid expression");
-                }
                 // Check if the dot is at the beginning of the number
                 if (i == 0 || !isdigit(expression[i - 1])) {
                     throw std::invalid_argument("Floating point number can't start with a dot");
@@ -86,27 +72,6 @@ public:
                 }
                 operators.pop(); // Remove '('
             } else if (c == '+' || c == '*' || c == '/') {
-                if (expression[i + 1] == '+' || expression[i - 1] == '+') {
-                    throw std::invalid_argument("Invalid expression");
-                }
-                if (expression[i + 1] == '-' || expression[i - 1] == '-') {
-                    throw std::invalid_argument("Invalid expression");
-                }
-                if (expression[i + 1] == '/' || expression[i - 1] == '/') {
-                    throw std::invalid_argument("Invalid expression");
-                }
-                if (expression[i + 1] == '*' || expression[i - 1] == '*') {
-                    throw std::invalid_argument("Invalid expression");
-                }
-                size_t j = i;
-                while (expression[j] != ')') {
-                    j--;
-                }
-                if (expression[j - 1] == '(') {
-                    throw std::invalid_argument("Invalid expression");
-                }
-
-                // Apply operators with higher or equal precedence
                 while (!operators.empty() && precedence(c) <= precedence(operators.top())) {
                     applyOperator(values, operators);
                 }
