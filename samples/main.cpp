@@ -13,14 +13,14 @@ int main(int argc, char **argv)
 
     while (s != "0") {
         try {
-            std::cout << "Введите выражение: ";
+            std::cout << "Enter an expression: ";
             std::cin >> s;
             std::cout << s << std::endl;
-            std::cout << "Результат: " << t1.evaluate(s) << std::endl;
+            std::cout << "Result: " << t1.evaluate(s) << std::endl;
         } catch (std::invalid_argument& e) {
             std::cout << e.what() << std::endl;
         } catch (std::runtime_error& e) {
-            std::cout << "Ошибка: " << e.what() << std::endl;
+            std::cout << "Error: " << e.what() << std::endl;
         }
     }
 }

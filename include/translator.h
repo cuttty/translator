@@ -21,6 +21,7 @@ public:
 
         for (size_t i = 0; i < expression.size(); ++i) {
             char c = expression[i];
+
             if (c == '-') {
                 // Check if the minus sign is at the beginning of a number
                 if (i == 0 || expression[i - 1] == '(') {
@@ -39,21 +40,22 @@ public:
                     operators.push(c);
                 }
             } else if (isdigit(c)) {
+                if (expression[i - 1] == '.' || expression[i + 1] == '.') {
+                    if (expression[i - 2] == '.' || expression[i + 2] == '.') {
+                        throw std::invalid_argument("Invalid floating point number");
+                    } else {
+                        size_t j = i + 1;
+                        while (!isdigit(expression[j])) {
+                            if (expression[j] == '.') {
+                                throw std::invalid_argument("Invalid floating point number");
+                            }
+                            ++j;
+                        }
+                    }
+                }
                 // Parse number
                 size_t j = i;
                 while (j < expression.size() && (isdigit(expression[j]) || expression[j] == '.')) {
-                    if (expression[j] == '.') {
-                        if (expression[j - 1] == '.' || expression[j + 1] == '.') {
-                            throw std::runtime_error("Invalid expression");
-                        }
-                        size_t l = j;
-                        while (isdigit(expression[l])) {
-                            if (expression[l + 1] == '.') {
-                                throw std::runtime_error("Invalid expression");
-                            }
-                            ++l;
-                        }
-                    }
                     ++j;
                 }
                 if (j > i + 1 && expression[j] == '.') {
@@ -65,10 +67,9 @@ public:
                 double value = std::stod(expression.substr(i, j - i));
                 values.push(value);
                 i = j - 1;
-
             } else if (c == '.') {
                 if (expression[i - 1] == '.' || expression[i + 1] == '.') {
-                    throw std::runtime_error("Invalid expression");
+                    throw std::invalid_argument("Invalid floating point number");
                 }
                 // Check if the dot is at the beginning of the number
                 if (i == 0 || !isdigit(expression[i - 1])) {
@@ -87,27 +88,42 @@ public:
                 }
                 operators.pop(); // Remove '('
             } else if (c == '+' || c == '*' || c == '/') {
-                if (expression[i + 1] == '+' || expression[i - 1] == '+') {
-                    throw std::invalid_argument("Invalid expression");
+                if (i == 0) {
+                    throw std::runtime_error("Invalid expression");
                 }
-                if (expression[i + 1] == '-' || expression[i - 1] == '-') {
-                    throw std::invalid_argument("Invalid expression");
+                size_t jPos = i + 1;
+                size_t jNeg = i - 1;
+                while (expression[jPos] == ' ') {
+                    jPos++;
                 }
-                if (expression[i + 1] == '/' || expression[i - 1] == '/') {
-                    throw std::invalid_argument("Invalid expression");
-                }
-                if (expression[i + 1] == '*' || expression[i - 1] == '*') {
-                    throw std::invalid_argument("Invalid expression");
-                }
-                size_t j = i;
-                while (expression[j] != ')') {
-                    j--;
-                }
-                if (expression[j - 1] == '(') {
-                    throw std::invalid_argument("Invalid expression");
+                while (expression[jNeg] == ' ') {
+                    jNeg--;
                 }
 
-                // Apply operators with higher or equal precedence
+                if (expression[jPos] == ')' || expression[jNeg] == '(') {
+                    throw std::runtime_error("Invalid expression");
+                }
+
+                if (expression[jPos] == '(') {
+                    jPos++;
+                    while (expression[jPos] == ' ') {
+                        jPos++;
+                    }
+                    if (expression[jPos] == ')') {
+                        throw std::runtime_error("Invalid expression");
+                    }
+                }
+
+                if (expression[jNeg] == ')') {
+                    jNeg--;
+                    while (expression[jNeg] == ' ') {
+                        jNeg++;
+                    }
+                    if (expression[jNeg] == '(') {
+                        throw std::runtime_error("Invalid expression");
+                    }
+                }
+
                 while (!operators.empty() && precedence(c) <= precedence(operators.top())) {
                     applyOperator(values, operators);
                 }
