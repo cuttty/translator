@@ -6,11 +6,11 @@
 int main(int argc, char **argv)
 {
     Translator translator;
-    std::string expression;
+    std::string expression = "";
 
     std::cout << "Welcome to the Calculator!" << std::endl << std::endl;
 
-    while (1) {
+    while (expression != "0") {
         std::cout << "Enter a mathematical expression: ";
         std::getline(std::cin, expression);
 
@@ -21,6 +21,7 @@ int main(int argc, char **argv)
             std::cerr << "Error evaluating expression: " << e.what() << std::endl;
         }
     }
-
+    std::cout << "Thanks for using the Calculator!" << std::endl << std::endl;
     return 0;
+
 }
